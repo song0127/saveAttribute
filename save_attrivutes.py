@@ -72,6 +72,8 @@ class saveAttrivutes_V2:
         
         self.dlg.lineEdit.clear()
         self.dlg.pushButton.clicked.connect(self.select_output_file)
+        #self.dlg.pushButton_2.clicked.connect(self.test)
+        
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -188,9 +190,12 @@ class saveAttrivutes_V2:
     def select_output_file(self):
         filename = QFileDialog.getSaveFileName(self.dlg, "Select output file ","", '*.txt')
         self.dlg.lineEdit.setText(filename)
+        self.dlg.label_3.setText(filename)
+
 
     def run(self):
         """Run method that performs all the real work"""
+        self.dlg.comboBox.clear()
         layers = self.iface.legendInterface().layers()
         layer_list = []
         for layer in layers:
@@ -198,6 +203,7 @@ class saveAttrivutes_V2:
 				
         self.dlg.comboBox.addItems(layer_list)
         # show the dialog
+        
         self.dlg.show()
         # Run the dialog event loop
         result = self.dlg.exec_()

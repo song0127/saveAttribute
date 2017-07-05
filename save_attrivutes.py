@@ -32,7 +32,7 @@ import os.path
 
 class saveAttrivutes_V2:
     """QGIS Plugin Implementation."""
-
+    
     def __init__(self, iface):
         """Constructor.
 
@@ -41,6 +41,9 @@ class saveAttrivutes_V2:
             application at run time.
         :type iface: QgsInterface
         """
+        self.dlg = saveAttrivutes_V2Dialog()
+       
+        
         # Save reference to the QGIS interface
         self.iface = iface
         # initialize plugin directory
@@ -60,8 +63,7 @@ class saveAttrivutes_V2:
                 QCoreApplication.installTranslator(self.translator)
 
         # Create the dialog (after translation) and keep reference
-        self.dlg = saveAttrivutes_V2Dialog()
-
+        
 
         # Declare instance attributes
         self.actions = []
@@ -72,9 +74,10 @@ class saveAttrivutes_V2:
         
         self.dlg.lineEdit.clear()
         self.dlg.pushButton.clicked.connect(self.select_output_file)
-        #self.dlg.pushButton_2.clicked.connect(self.test)
-        
+        self.dlg.pushButton_2.clicked.connect(self.open_close_layer)
 
+        
+        
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
         """Get the translation for a string using Qt translation API.
@@ -89,7 +92,6 @@ class saveAttrivutes_V2:
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('saveAttrivutes_V2', message)
-
 
     def add_action(
         self,
@@ -190,20 +192,35 @@ class saveAttrivutes_V2:
     def select_output_file(self):
         filename = QFileDialog.getSaveFileName(self.dlg, "Select output file ","", '*.txt')
         self.dlg.lineEdit.setText(filename)
-        self.dlg.label_3.setText(filename)
+        
+        
+        #self.dlg.label_3.setText(str(selectedLayer))
 
+    def open_close_layer(self):
+        global selectedLayerIndex
+        selectedLayerIndex = self.dlg.comboBox.currentIndex()
+        global selectedLayer
+        selectedLayer = layers[selectedLayerIndex]
 
+        self.dlg.label_3.setText(str(selectedLayer))
+        #selectedLayer.hide()
+        legend = self.iface.legendInterface()
+        legend.setLayerVisible(selectedLayer, False)
+        #layers.setLayerVisible(selectedLayer, False)
+        
     def run(self):
         """Run method that performs all the real work"""
         self.dlg.comboBox.clear()
+        global layers
         layers = self.iface.legendInterface().layers()
+        global layer_list
         layer_list = []
         for layer in layers:
             layer_list.append(layer.name())
+            
 				
         self.dlg.comboBox.addItems(layer_list)
         # show the dialog
-        
         self.dlg.show()
         # Run the dialog event loop
         result = self.dlg.exec_()
@@ -213,9 +230,8 @@ class saveAttrivutes_V2:
             # substitute with your code.
             filename = self.dlg.lineEdit.text()
             output_file = open(filename, 'w')
-
-            selectedLayerIndex = self.dlg.comboBox.currentIndex()
-            selectedLayer = layers[selectedLayerIndex]
+            
+            
             fields = selectedLayer.pendingFields()
             fieldnames = [field.name() for field in fields]			
 

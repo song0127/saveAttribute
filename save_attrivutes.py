@@ -27,7 +27,7 @@ import resources
 # Import the code for the dialog
 from save_attrivutes_dialog import saveAttrivutes_V2Dialog
 import os.path
-
+from PyQt4 import QtGui
 
 
 class saveAttrivutes_V2:
@@ -42,7 +42,7 @@ class saveAttrivutes_V2:
         :type iface: QgsInterface
         """
         self.dlg = saveAttrivutes_V2Dialog()
-       
+        
         
         # Save reference to the QGIS interface
         self.iface = iface
@@ -74,9 +74,9 @@ class saveAttrivutes_V2:
         
         self.dlg.lineEdit.clear()
         self.dlg.pushButton.clicked.connect(self.select_output_file)
-        self.dlg.pushButton_2.clicked.connect(self.open_close_layer)
-
+        self.dlg.checkBox_3.stateChanged.connect(self.open_close_layer)
         
+        #self.initGUI()
         
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -177,8 +177,9 @@ class saveAttrivutes_V2:
             text=self.tr(u'Save attributes_V2 as CSV'),
             callback=self.run,
             parent=self.iface.mainWindow())
-
-
+        
+        
+       
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
@@ -193,35 +194,41 @@ class saveAttrivutes_V2:
         filename = QFileDialog.getSaveFileName(self.dlg, "Select output file ","", '*.txt')
         self.dlg.lineEdit.setText(filename)
         
-        
-        #self.dlg.label_3.setText(str(selectedLayer))
-
-    def open_close_layer(self):
-        global selectedLayerIndex
-        selectedLayerIndex = self.dlg.comboBox.currentIndex()
-        global selectedLayer
-        selectedLayer = layers[selectedLayerIndex]
-
-        self.dlg.label_3.setText(str(selectedLayer))
-        #selectedLayer.hide()
+    def open_close_layer(self,value):
         legend = self.iface.legendInterface()
-        legend.setLayerVisible(selectedLayer, False)
-        #layers.setLayerVisible(selectedLayer, False)
-        
+        if value:
+            legend.setLayerVisible(layers[i], True)
+            self.dlg.label_3.setText(str(layers[0]))
+        else :
+            legend.setLayerVisible(layers[0], False)
+            self.dlg.label_3.setText("UNCHECKED!")
+            
+     
+            
     def run(self):
         """Run method that performs all the real work"""
-        self.dlg.comboBox.clear()
+        global selectedLayerIndex
+        #selectedLayerIndex = self.dlg.comboBox.currentIndex()
+        #selectedLayerIndex = 0
+        #global selectedLayer
         global layers
         layers = self.iface.legendInterface().layers()
-        global layer_list
         layer_list = []
         for layer in layers:
             layer_list.append(layer.name())
-            
-				
-        self.dlg.comboBox.addItems(layer_list)
+        #selectedLayer = layers[selectedLayerIndex]
+        
         # show the dialog
         self.dlg.show()
+        grid = self.dlg.gridLayout
+        
+        for i in range(0,len(layer_list)):
+            #checkBox = QtGui.QCheckBox(layer_list[i])
+            locals()['checkBox'+str(i)] = QtGui.QCheckBox(layer_list[i])
+            #checkBox.setObjectName(layer[i])
+            grid.addWidget(locals()['checkBox'+str(i)],i,0)
+            locals()['checkBox'+str(i)].stateChanged.connect(self.open_close_layer)
+        
         # Run the dialog event loop
         result = self.dlg.exec_()
         # See if OK was pressed
@@ -230,8 +237,6 @@ class saveAttrivutes_V2:
             # substitute with your code.
             filename = self.dlg.lineEdit.text()
             output_file = open(filename, 'w')
-            
-            
             fields = selectedLayer.pendingFields()
             fieldnames = [field.name() for field in fields]			
 

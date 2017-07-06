@@ -96,7 +96,7 @@
     <rect>
      <x>50</x>
      <y>140</y>
-     <width>541</width>
+     <width>431</width>
      <height>31</height>
     </rect>
    </property>
@@ -104,17 +104,41 @@
     <string>開啟/關閉圖層</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_2">
+  <widget class="QWidget" name="gridLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>502</x>
+     <y>30</y>
+     <width>171</width>
+     <height>341</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <property name="sizeConstraint">
+     <enum>QLayout::SetNoConstraint</enum>
+    </property>
+   </layout>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_3">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>290</x>
      <y>90</y>
-     <width>93</width>
-     <height>28</height>
+     <width>121</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">
-    <string>切換</string>
+    <string>開啟／關閉</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="tristate">
+    <bool>false</bool>
    </property>
   </widget>
  </widget>
